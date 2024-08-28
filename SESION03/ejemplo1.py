@@ -22,11 +22,11 @@ class Fraccion:
     def get_den(self):
         return self.__den
 
+# Programa principal
 def main():
-    b = 23
     fr = Fraccion()
     fs = Fraccion(3, 5)
-    #fr.set_num(1)
+    fr.set_num(1)
     fr.set_den(0)
     fr.__den = 0
     print(f"{fr.get_num()}/{fr.get_den()}")
