@@ -1,1 +1,10 @@
+class CuentaBancaria:
+    def __init__(self, numeroCta, nombreCliente, saldoCta, fechaApertura, ultimoRetiro, ultimaConsignacion, Ctacorriente):
+        self.__nombreCliente = nonbreCliente
+        self.__saldoCta = saldoCta 
+        self.__fechaApertura = fechaApertura
+        self.__ultimoRetiro = ultimoRetiro
+        self.__ultimaCopnsignacion = ultimaConsignacion 
+        self.__Ctacorriente = Ctacorriente  
 
+        
