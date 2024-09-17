@@ -1,0 +1,209 @@
+import java.io.*;
+import java.util.*;
+
+// Clase que maneja una submatriz 3x3
+class Matriz {
+    private int[][] box;
+
+    public Matriz() {
+        box = new int[3][3];  // Inicializa una matriz de 3x3
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                box[i][j] = 0;  // Inicializa todas las celdas en cero
+            }
+        }
+    }
+
+    public int getValue(int row, int col) {
+        return box[row][col];
+    }
+
+    public void setValue(int row, int col, int value) {
+        if (value >= 1 && value <= 9) {
+            box[row][col] = value;
+        }
+    }
+
+    public boolean isComplete() {
+        // Verifica si todas las celdas están llenas
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (box[i][j] == 0) return false;
+            }
+        }
+        return true;
+    }
+
+    public void print() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                System.out.print(box[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+}
+
+// Clase Sudoku que maneja el tablero 9x9 y el juego
+public class Sudoku {
+    private static final int SIZE = 9;
+    private int[][] board;
+    private List<String> moves;
+    private Random rand;
+
+    public Sudoku() {
+        board = new int[SIZE][SIZE];
+        moves = new ArrayList<>();
+        rand = new Random();
+    }
+
+    public void startNewGame() {
+        for (int i = 0; i < SIZE; i++) {
+            Arrays.fill(board[i], 0);
+        }
+        moves.clear();
+    }
+
+    public void startGameWithPredefinedCells(int numCells) {
+        startNewGame();
+        for (int i = 0; i < numCells; i++) {
+            int row = rand.nextInt(SIZE);
+            int col = rand.nextInt(SIZE);
+            int value = rand.nextInt(9) + 1;
+            if (isSafe(row, col, value)) {
+                board[row][col] = value;
+                moves.add("Predefined: " + row + "," + col + "," + value);
+            }
+        }
+    }
+
+    public boolean isSafe(int row, int col, int num) {
+        return isSafeInRow(row, num) && isSafeInCol(col, num) && isSafeInBox(row, col, num);
+    }
+
+    private boolean isSafeInRow(int row, int num) {
+        for (int col = 0; col < SIZE; col++) {
+            if (board[row][col] == num) return false;
+        }
+        return true;
+    }
+
+    private boolean isSafeInCol(int col, int num) {
+        for (int row = 0; row < SIZE; row++) {
+            if (board[row][col] == num) return false;
+        }
+        return true;
+    }
+
+    private boolean isSafeInBox(int row, int col, int num) {
+        int startRow = row - row % 3;
+        int startCol = col - col % 3;
+        for (int r = startRow; r < startRow + 3; r++) {
+            for (int c = startCol; c < startCol + 3; c++) {
+                if (board[r][c] == num) return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean placeValue(int row, int col, int value) {
+        if (isSafe(row, col, value)) {
+            board[row][col] = value;
+            moves.add("Move: " + row + "," + col + "," + value);
+            return true;
+        }
+        return false;
+    }
+
+    public void printBoard() {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    public void saveGame(String filename) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            for (String move : moves) {
+                writer.write(move);
+                writer.newLine();
+            }
+        }
+    }
+
+    public void loadGame(String filename) throws IOException {
+        startNewGame();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 3) {
+                    int row = Integer.parseInt(parts[0].split(":")[1].trim());
+                    int col = Integer.parseInt(parts[1].trim());
+                    int value = Integer.parseInt(parts[2].trim());
+                    board[row][col] = value;
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Sudoku sudoku = new Sudoku();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("1. Iniciar nuevo juego");
+            System.out.println("2. Iniciar con casillas predeterminadas");
+            System.out.println("3. Guardar partida");
+            System.out.println("4. Cargar partida");
+            System.out.println("5. Salir");
+            System.out.print("Selecciona una opción: ");
+            int option = scanner.nextInt();
+
+            switch (option) {
+                case 1:
+                    sudoku.startNewGame();
+                    break;
+                case 2:
+                    System.out.print("Ingrese número de casillas predeterminadas (9-21): ");
+                    int numCells = scanner.nextInt();
+                    if (numCells >= 9 && numCells <= 21) {
+                        sudoku.startGameWithPredefinedCells(numCells);
+                    } else {
+                        System.out.println("Número inválido.");
+                    }
+                    break;
+                case 3:
+                    System.out.print("Ingrese el nombre del archivo para guardar: ");
+                    scanner.nextLine();  // Limpiar buffer
+                    String saveFile = scanner.nextLine();
+                    try {
+                        sudoku.saveGame(saveFile);
+                    } catch (IOException e) {
+                        System.out.println("Error al guardar el archivo.");
+                    }
+                    break;
+                case 4:
+                    System.out.print("Ingrese el nombre del archivo para cargar: ");
+                    scanner.nextLine();  // Limpiar buffer
+                    String loadFile = scanner.nextLine();
+                    try {
+                        sudoku.loadGame(loadFile);
+                    } catch (IOException e) {
+                        System.out.println("Error al cargar el archivo.");
+                    }
+                    break;
+                case 5:
+                    System.out.println("Saliendo...");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Opción no válida.");
+            }
+
+            sudoku.printBoard();
+        }
+    }
+}
