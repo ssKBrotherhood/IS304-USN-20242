@@ -1,0 +1,36 @@
+
+def agregar_producto(nombre, cantidad):
+    if nombre in inventario:
+        inventario[nombre] += cantidad
+    else:
+        inventario[nombre] = cantidad
+    print(f'Producto "{nombre}" agregado con cantidad {cantidad}.')
+
+def eliminar_producto(nombre):
+    if nombre in inventario:
+        del inventario[nombre]
+        print(f'Producto "{nombre}" eliminado.')
+    else:
+        print(f'Producto "{nombre}" no encontrado en el inventario.')
+
+def mostrar_inventario():
+    print("\nInventario:")
+    for producto, cantidad in inventario.items():
+        print(f'- {producto}: {cantidad}')
+        
+def productos_bajos(cantidad_minima):
+    print(f"\nProductos con cantidades bajas (menos de {cantidad_minima}):")
+    for producto, cantidad in inventario.items():
+        if cantidad < cantidad_minima:
+            print(f'- {producto}: {cantidad}')
+
+def menu():
+    while True:
+        print("\nMenú:")
+        print("1. Agregar producto")
+        print("2. Eliminar producto")
+        print("3. Mostrar inventario")
+        print("4. Mostrar productos con cantidades bajas")
+        print("5. Salir")
+        
+     
